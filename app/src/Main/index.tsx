@@ -15,7 +15,45 @@ export function Main() {
     const [selectedTable, setSelectedTable] = useState("");
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     function handleAddToCart(product: Product){
-        alert(product.name);
+        if(!selectedTable){
+            setIsTableModalVisible(true);
+        }
+
+        setCartItems((prevState) => {
+            const itemIndex = prevState.findIndex(cartItems => cartItems.product._id === product._id );
+            if(itemIndex < 0){
+                return prevState.concat({
+                    quantity: 1,
+                    product,
+                });
+            }
+            const newCartItems = [...prevState];
+            const item = newCartItems[itemIndex];
+            newCartItems[itemIndex] = {
+                ...item,
+                quantity: newCartItems[itemIndex].quantity + 1
+            };
+            return newCartItems;
+        });
+    }
+
+    function handleDecrementCartItem(product: Product){
+        setCartItems((prevState) => {
+            const itemIndex = prevState.findIndex(
+                cartItems => cartItems.product._id === product._id
+            );
+            const item = prevState[itemIndex];
+            const newCartItems = [...prevState];
+            if(item.quantity === 1){
+                newCartItems.splice(itemIndex, 1);
+                return newCartItems;
+            }
+            newCartItems[itemIndex] = {
+                ...item,
+                quantity: newCartItems[itemIndex].quantity - 1
+            };
+            return newCartItems;
+        });
     }
 
     function handleSaveTable(table: string) {
@@ -54,7 +92,9 @@ export function Main() {
                     )}
                     {selectedTable && (
                         <Cart
+                            onAdd={handleAddToCart}
                             cartItems={cartItems}
+                            onDecrement={handleDecrementCartItem}
                         />
                     )}
                 </FooterContainer>
