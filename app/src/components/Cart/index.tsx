@@ -15,20 +15,36 @@ import {PlusCircle} from "../Icons/PlusCircle";
 import {MinusCircle} from "../Icons/MinusCircle";
 import {Button} from "../Button";
 import {Product} from "../../types/Product";
+import {OrderConfirmModal} from "../OrderConfirmModal";
+import {useState} from "react";
 
 
 interface cartProps {
     cartItems: CartItem[];
     onAdd: (product: Product) => void;
     onDecrement: (product: Product) => void;
+    onConfirmOrder: () => void;
 }
 
-export function Cart({cartItems, onAdd, onDecrement}: cartProps) {
+export function Cart({cartItems, onAdd, onDecrement, onConfirmOrder}: cartProps) {
+    const [isLoading, setIsLoading] = useState(false);
+    const [isModalVisible, setIsModalVisible] = useState(false);
     const total = cartItems.reduce( (acc, cartItem) => {
         return acc + cartItem.quantity * cartItem.product.price;
     }, 0);
+
+    function handleConfirmOrder(){
+        setIsModalVisible(true);
+    }
+
+    function handleOk(){
+        onConfirmOrder();
+        setIsModalVisible(false);
+    }
+
     return (
         <>
+            <OrderConfirmModal onOk={() => handleOk()} visible={isModalVisible} />
             {cartItems.length > 0 && (
                 <FlatList
                     data={cartItems}
@@ -76,12 +92,16 @@ export function Cart({cartItems, onAdd, onDecrement}: cartProps) {
                             <Text size={20} weight="600">{formatCurrency(total)}</Text>
                         </>
                     ) : (
-
                         <Text color="#999">Seu carrinho está vazio</Text>
                     )}
 
                 </TotalContainer>
-                <Button disabled={cartItems.length === 0} onPress={() => alert("confirmar pedido")}>Confirmar Pedido</Button>
+                <Button
+                    onPress={handleConfirmOrder}
+                    loading={isLoading}
+                    disabled={cartItems.length === 0}>
+                    Confirmar Pedido
+                </Button>
             </Summary>
         </>
     );
