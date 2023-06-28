@@ -19,4 +19,9 @@ export const categories = [
     name: 'Promoções',
     icon: '🏷',
   },
+  {
+    _id: '6372d5dcssf9ebdda354700c94',
+    name: 'Prato do dia',
+    icon: '🏷',
+  },
 ];
